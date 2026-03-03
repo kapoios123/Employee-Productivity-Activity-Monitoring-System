@@ -42,6 +42,3 @@ Since this project is shared as source code (`.py`), you need to install the dep
 ```bash
 pip install customtkinter pandas pynput Pillow pystray
 
-
-
-![Admin Dashboard](Αdmin1.jpg)
