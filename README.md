@@ -1,63 +1,43 @@
-🛡️ WorkFlow Sentinel (Employee Activity & Management System)
-WorkFlow Sentinel is a comprehensive Python-based solution for workplace productivity monitoring, activity logging, and internal communication. It features a modern GUI and a robust backend using SQLite and multi-threading.
+# 🛡️ WorkFlow Sentinel (Enterprise Monitoring Suite)
 
-🚀 Key Features
-Real-time Dashboard: Monitor active users, their IP addresses, and live status (Online/Idle/Break).
+WorkFlow Sentinel is a dual-application ecosystem designed for workforce management. It consists of an **Admin Dashboard** for supervisors and a **Client Agent** for employee workstations, all synchronized through a shared SQLite database.
 
-Activity Tracking: Automated detection of user inactivity via mouse and keyboard listeners.
+---
 
-Internal Messaging: Built-in chat system for direct communication between Admin and Clients.
+## 🏗️ System Architecture
 
-Automated Reporting: Generates and sends HTML-formatted activity reports via SMTP.
+The project is split into two independent Python applications:
 
-Remote Desktop Integration: Quick access to AnyDesk for remote technical support.
+### 1. Admin Control Panel (`archer_admin.py`)
+The "Brain" of the system.
+* **Live Monitoring:** Tracks heartbeats, active status, and IP addresses of all workstations.
+* **Configuration Hub:** Manage departments, email settings, and view activity logs.
+* **Smart Reporting:** Automatically aggregates data using `pandas` and sends HTML reports via SMTP.
+* **Support Integration:** Launch AnyDesk sessions directly from the UI.
 
-🔧 First-Time Setup & Initialization
-The application is designed to be user-friendly even during the initial configuration.
+### 2. Client Agent (`archer_v2.py`)
+The "Worker" application that runs on every employee's PC.
+* **System Tray Operation:** Runs discreetly in the background.
+* **Idle Detection:** Uses low-level hooks (`pynput`) to detect inactivity and log idle time automatically.
+* **Real-time Heartbeat:** Regularly updates the database to signal that the workstation is active.
+* **Interactive Menu:** Allows users to manually set states like "Break" or "External Work".
 
-1. Database Connection (First Startup)
-When you run the application for the first time:
+---
 
-Automatic Detection: The app attempts to locate the database file (archer.db).
+## 🔧 First-Time Configuration (User Friendly)
 
-Configuration Prompt: If the database is not found, an error message will appear. Simply go to the Settings menu.
+Both applications feature an intelligent setup process to ensure they work in any environment:
 
-Browse & Apply: Use the "Browse" button to select your .db file and click Apply.
+### How to Connect the Database
+1. **Initial Launch:** On the first run, if the application cannot find the database (e.g., if you haven't set the network path yet), it will notify you.
+2. **Setup via UI:** Go to the **Settings** section within the Admin app, click **Browse**, and select your `archer.db` file.
+3. **Auto-Configuration:** Once you hit **Apply**, the app generates a `config.ini` file. From that point on, both the Admin and Client will load the correct path automatically without any manual intervention.
 
-Persistent Settings: The app creates a config.ini file locally. On your next launch, the app will remember your path and start without any prompts.
+---
 
-2. Dependencies
-Install the required Python libraries:
---> pip install customtkinter pandas pynput Pillow pystray
+## 🛠️ Installation & Requirements
 
+Since this project is shared as source code (`.py`), you need to install the dependencies:
 
-💻 Technical Details
-The Client App (archer_v2.py)
-The client runs as a background process visible in the System Tray.
-
-Inactivity Logic: If no input is detected for a specific threshold, the app automatically logs an "IDLE" event to the database.
-
-Connection Resilience: Includes retry logic for database operations to handle network instability.
-
-The Admin Panel (archer_admin.py)
-The central hub for management.
-
-Threading: Uses Python's threading module to handle heartbeats and email sending without blocking the UI.
-
-Data Processing: Uses pandas to aggregate logs into professional reports.
-
-📂 Project Structure
-archer_admin.py: The management dashboard source code.
-
-archer_v2.py: The client-side monitoring agent source code.
-
-archer.db: The SQLite database schema (Initial data included).
-
-🛠️ How to Run
-Clone the repository to your local machine.
-
-Ensure Python 3.10+ is installed.
-
-Run the Admin Panel: python archer_admin.py
-
-Configure the database path through the UI as described in the Setup section.
+```bash
+pip install customtkinter pandas pynput Pillow pystray
