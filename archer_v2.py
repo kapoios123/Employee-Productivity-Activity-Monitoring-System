@@ -13,7 +13,7 @@ import re
 def get_db_path():
     config = configparser.ConfigParser()
     config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.ini')
-    default_path = r'\\10.0.111.7\Analosima\archer\archer.db'
+    default_path = r'\\192.168.2.1\something\archer.db'  # insert the archer.db filepath here
     
     if os.path.exists(config_file):
         try:
@@ -406,4 +406,5 @@ class ArcherClient:
 if __name__ == "__main__":
     root = ctk.CTk()
     app = ArcherClient(root)
+
     root.mainloop()
