@@ -41,3 +41,17 @@ Since this project is shared as source code (`.py`), you need to install the dep
 
 ```bash
 pip install customtkinter pandas pynput Pillow pystray
+
+Running the Project:
+Database: Ensure archer.db is in the project folder.
+
+Launch Admin: python archer_admin.py (Configure the DB path here first).
+
+Launch Client: python archer_v2.py
+
+## 🔍 Technical Highlights
+Multi-threading: Non-blocking operations for UI responsiveness.
+
+Database Resilience: Automatic reconnection logic for unstable network environments.
+
+Security: Single-instance enforcement using lock files to prevent multiple agents from running on the same PC.
