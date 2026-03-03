@@ -44,4 +44,4 @@ pip install customtkinter pandas pynput Pillow pystray
 
 
 
-![Dashboard]admin 1.png
+![Admin Dashboard](admin 1.png)
