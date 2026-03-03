@@ -1,6 +1,6 @@
 # 🛡️Archer (Enterprise Monitoring Suite)
 
-WorkFlow Sentinel is a dual-application ecosystem designed for workforce management. It consists of an **Admin Dashboard** for supervisors and a **Client Agent** for employee workstations, all synchronized through a shared SQLite database.
+Archer is a dual-application ecosystem designed for workforce management. It consists of an **Admin Dashboard** for supervisors and a **Client Agent** for employee workstations, all synchronized through a shared SQLite database.
 
 ---
 
