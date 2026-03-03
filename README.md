@@ -49,7 +49,8 @@ Launch Admin: python archer_admin.py (Configure the DB path here first).
 
 Launch Client: python archer_v2.py
 
-## 🔍 Technical Highlights
+
+## UPDATED ## 
 Multi-threading: Non-blocking operations for UI responsiveness.
 
 Database Resilience: Automatic reconnection logic for unstable network environments.
