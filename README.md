@@ -29,7 +29,7 @@ The "Worker" application that runs on every employee's PC.
 Both applications feature an intelligent setup process to ensure they work in any environment:
 
 ### How to Connect the Database
-1. **Initial Launch:** On the first run, if the application cannot find the database (e.g., if you haven't set the network path yet), it will notify you.
+1. **Initial Launch:** On the first run, if the application cannot find the database, it will notify you.
 2. **Setup via UI:** Go to the **Settings** section within the Admin app, click **Browse**, and select your `archer.db` file.
 3. **Auto-Configuration:** Once you hit **Apply**, the app generates a `config.ini` file. From that point on, both the Admin and Client will load the correct path automatically without any manual intervention.
 
@@ -41,18 +41,3 @@ Since this project is shared as source code (`.py`), you need to install the dep
 
 ```bash
 pip install customtkinter pandas pynput Pillow pystray
-
-Running the Project:
-Database: Ensure archer.db is in the project folder.
-
-Launch Admin: python archer_admin.py (Configure the DB path here first).
-
-Launch Client: python archer_v2.py
-
-
-## UPDATED ## 
-Multi-threading: Non-blocking operations for UI responsiveness.
-
-Database Resilience: Automatic reconnection logic for unstable network environments.
-
-Security: Single-instance enforcement using lock files to prevent multiple agents from running on the same PC.
