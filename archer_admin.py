@@ -5,31 +5,68 @@ from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import socket
+import tkinter as tk # Χρειάζεται για το αρχικό popup
+
 
 # --- CONFIGURATION MANAGER ---
+
 def get_db_path():
     config = configparser.ConfigParser()
+    # Το config.ini θα αποθηκεύεται στον ίδιο φάκελο με το .py αρχείο
     config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.ini')
-    default_path = r'\\10.0.111.7\Analosima\archer\archer.db'
+    
+    db_path = None
+
+    # 1. Προσπάθεια ανάγνωσης από το αρχείο ρυθμίσεων
     if os.path.exists(config_file):
         try:
-            config.read(config_file)
-            return config.get('SETTINGS', 'db_path', fallback=default_path)
-        except: return default_path
-    return default_path
+            config.read(config_file, encoding='utf-8')
+            db_path = config.get('SETTINGS', 'db_path', fallback=None)
+        except:
+            db_path = None
+
+    # 2. Αν δεν υπάρχει στο config ή το αρχείο της βάσης δεν υπάρχει στον δίσκο
+    if not db_path or not os.path.exists(db_path):
+        root_temp = tk.Tk()
+        root_temp.withdraw()
+        
+        messagebox.showinfo("Σύνδεση Βάσης", "Δεν βρέθηκε η βάση δεδομένων archer.db.\nΠαρακαλώ επιλέξτε το αρχείο.")
+        
+        selected_path = filedialog.askopenfilename(
+            title="Επιλογή archer.db",
+            filetypes=[("SQLite Database", "*.db"), ("All files", "*.*")]
+        )
+        
+        root_temp.destroy()
+
+        if selected_path:
+            save_db_path_to_ini(selected_path)
+            return selected_path
+        else:
+            sys.exit() # Κλείσιμο αν ο χρήστης δεν επιλέξει τίποτα
+            
+    return db_path
 
 def save_db_path_to_ini(new_path):
     config = configparser.ConfigParser()
     config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.ini')
     config['SETTINGS'] = {'db_path': new_path}
-    with open(config_file, 'w') as configfile:
+    with open(config_file, 'w', encoding='utf-8') as configfile:
         config.write(configfile)
 
+# --- ΕΚΤΕΛΕΣΗ (ΕΞΩ ΑΠΟ ΤΙΣ ΣΥΝΑΡΤΗΣΕΙΣ) ---
+
+# 1. Πρώτα βρίσκουμε το path της βάσης
 DB_PATH = get_db_path()
+
+# 2. Ορίζουμε το LOCK FILE (Αυτό έλειπε και σου χτύπαγε error)
 LOCK_FILE_ADMIN = os.path.join(os.environ.get('TEMP', ''), 'archer_admin.lock')
 
+# 3. Ρυθμίσεις εμφάνισης
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
+
+# Μετά ξεκινάει η class ArcherAdmin...
 
 class ArcherAdmin:
     def __init__(self, root):
@@ -405,9 +442,16 @@ class ArcherAdmin:
         import shutil
         possible = [r"C:\Program Files (x86)\AnyDesk\AnyDesk.exe", r"C:\Program Files\AnyDesk\AnyDesk.exe", shutil.which("anydesk.exe")]
         exe_path = next((p for p in possible if p and os.path.exists(p)), None)
-        target = self.ent_anydesk.get().strip() or self.ent_ip.get().strip()
-        if target and target != "-" and exe_path:
+        
+        # Παίρνουμε την τιμή και καθαρίζουμε τυχόν NaN ή κενά
+        target = self.ent_anydesk.get().strip()
+        if not target or target.lower() == "nan" or target == "-":
+            target = self.ent_ip.get().strip() # Δοκιμή με την IP αν το AnyDesk ID λείπει
+
+        if target and target.lower() != "nan" and target != "-" and exe_path:
             subprocess.Popen([exe_path, target])
+        else:
+            messagebox.showwarning("AnyDesk Error", "Δεν βρέθηκε έγκυρο ID ή IP για σύνδεση.")
 
     def send_instant_msg(self):
         u, m = self.ent_u.get().strip(), self.msg_text.get().strip()
@@ -531,7 +575,9 @@ class ArcherAdmin:
                 SELECT user_id, username, hostname, ip_address, ip_type, department, anydesk_id, phone 
                 FROM user_config
             """
-            live_df = pd.read_sql_query(live_q, conn)
+            # Διάβασμα από τη βάση ΚΑΙ μετά fillna
+            live_df = pd.read_sql_query(live_q, conn) 
+            live_df = live_df.fillna("")
 
             for i in self.tree_status.get_children(): self.tree_status.delete(i)
             currently_online = set()
