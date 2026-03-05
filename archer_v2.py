@@ -9,7 +9,7 @@ import winsound
 import subprocess
 import re
 
-# --- CONFIGURATION MANAGER ---
+
 # --- CONFIGURATION MANAGER ---
 def get_db_path():
     config = configparser.ConfigParser()
@@ -451,3 +451,4 @@ if __name__ == "__main__":
     app = ArcherClient(root)
 
     root.mainloop()
+
