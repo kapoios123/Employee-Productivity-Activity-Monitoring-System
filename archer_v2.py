@@ -10,19 +10,62 @@ import subprocess
 import re
 
 # --- CONFIGURATION MANAGER ---
+# --- CONFIGURATION MANAGER ---
 def get_db_path():
     config = configparser.ConfigParser()
+    # Το αρχείο ρυθμίσεων θα είναι στον ίδιο φάκελο με το script
     config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.ini')
-    default_path = r'\\192.168.2.1\something\archer.db'  # insert the archer.db filepath here
     
+    db_path = None
+
+    # 1. Προσπάθεια ανάγνωσης από το config.ini
     if os.path.exists(config_file):
         try:
-            config.read(config_file)
-            return config.get('SETTINGS', 'db_path', fallback=default_path)
+            config.read(config_file, encoding='utf-8')
+            db_path = config.get('SETTINGS', 'db_path', fallback=None)
         except:
-            return default_path
-    return default_path
+            db_path = None
 
+    # 2. Αν δεν υπάρχει στο config ή το αρχείο που δείχνει το config δεν υπάρχει πια
+    if not db_path or not os.path.exists(db_path):
+        # Δημιουργία κρυφού παραθύρου για το διάλογο
+        temp_root = ctypes.windll.user32.GetForegroundWindow() # Για να έρθει μπροστά το παράθυρο
+        import tkinter as tk
+        from tkinter import filedialog, messagebox
+        
+        root_temp = tk.Tk()
+        root_temp.withdraw()
+        root_temp.attributes("-topmost", True)
+        
+        messagebox.showinfo("Archer System", "Παρακαλώ επιλέξτε το αρχείο της βάσης δεδομένων (archer.db).")
+        
+        selected_file = filedialog.askopenfilename(
+            title="Επιλογή archer.db",
+            filetypes=[("SQLite Database", "*.db"), ("All files", "*.*")]
+        )
+        
+        root_temp.destroy()
+
+        if selected_file:
+            save_db_path_to_ini(selected_file)
+            return selected_file
+        else:
+            # Αν ο χρήστης πατήσει Cancel, το πρόγραμμα κλείνει
+            messagebox.showerror("Error", "Η εφαρμογή δεν μπορεί να ξεκινήσει χωρίς βάση δεδομένων.")
+            sys.exit()
+            
+    return db_path
+
+def save_db_path_to_ini(new_path):
+    config = configparser.ConfigParser()
+    config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.ini')
+    if not config.has_section('SETTINGS'):
+        config.add_section('SETTINGS')
+    config.set('SETTINGS', 'db_path', str(new_path))
+    with open(config_file, 'w', encoding='utf-8') as configfile:
+        config.write(configfile)
+
+# Εκτέλεση της αναζήτησης
 DB_PATH = get_db_path()
 LOCK_FILE = os.path.join(os.environ.get('TEMP', ''), 'archer_client.lock')
 
